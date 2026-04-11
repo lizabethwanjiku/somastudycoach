@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cybersecurity Snake Game</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+    }
+    canvas {
+      background: #222;
+      border: 2px solid #fff;
+    }
+    #popup {
+      display: none;
+      position: fixed;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #333;
+      padding: 20px;
+      border: 2px solid #fff;
+      border-radius: 8px;
+      max-width: 400px;
+    }
+    #popup h2 {
+      margin-top: 0;
+    }
+    #popup button {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: #555;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Cybersecurity Snake Game</h1>
+  <canvas id="gameCanvas" width="400" height="400"></canvas>
+  <div id="popup">
+    <h2>⚠️ Cybersecurity Threat!</h2>
+    <p id="threatText"></p>
+    <p id="defenseText"></p>
+    <button onclick="closePopup()">Continue</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const box = 20;
+    let snake = [{x: 9*box, y: 10*box}];
+    let direction = "RIGHT";
+
+    // Fruits: good (green) and bad (red)
+    let goodFruit = spawnFruit();
+    let badFruit = spawnFruit();
+
+    const threats = [
+      { threat: "Phishing Attack", defense: "Always verify links and sender identity before clicking." },
+      { threat: "Malware Infection", defense: "Use antivirus software and keep systems updated." },
+      { threat: "Password Breach", defense: "Use strong, unique passwords and enable multi-factor authentication." },
+      { threat: "Social Engineering", defense: "Be cautious of unsolicited requests for sensitive information." }
+    ];
+
+    document.addEventListener("keydown", event => {
+      if(event.keyCode == 37 && direction != "RIGHT") direction = "LEFT";
+      else if(event.keyCode == 38 && direction != "DOWN") direction = "UP";
+      else if(event.keyCode == 39 && direction != "LEFT") direction = "RIGHT";
+      else if(event.keyCode == 40 && direction != "UP") direction = "DOWN";
+    });
+
+    function spawnFruit() {
+      return {
+        x: Math.floor(Math.random()*20)*box,
+        y: Math.floor(Math.random()*20)*box
+      };
+    }
+
+    function draw() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+
+      // Draw snake
+      for(let i=0; i<snake.length; i++) {
+        ctx.fillStyle = (i==0) ? "lime" : "white";
+        ctx.fillRect(snake[i].x, snake[i].y, box, box);
+      }
+
+      // Draw fruits
+      ctx.fillStyle = "green";
+      ctx.fillRect(goodFruit.x, goodFruit.y, box, box);
+
+      ctx.fillStyle = "red";
+      ctx.fillRect(badFruit.x, badFruit.y, box, box);
+
+      // Snake movement
+      let snakeX = snake[0].x;
+      let snakeY = snake[0].y;
+
+      if(direction == "LEFT") snakeX -= box;
+      if(direction == "UP") snakeY -= box;
+      if(direction == "RIGHT") snakeX += box;
+      if(direction == "DOWN") snakeY += box;
+
+      // Eating good fruit
+      if(snakeX == goodFruit.x && snakeY == goodFruit.y) {
+        goodFruit = spawnFruit();
+      } else {
+        snake.pop();
+      }
+
+      // Eating bad fruit
+      if(snakeX == badFruit.x && snakeY == badFruit.y) {
+        showPopup();
+        badFruit = spawnFruit();
+      }
+
+      let newHead = {x: snakeX, y: snakeY};
+
+      // Game over if snake hits wall or itself
+      if(snakeX < 0 || snakeY < 0 || snakeX >= canvas.width || snakeY >= canvas.height || collision(newHead, snake)) {
+        clearInterval(game);
+        alert("Game Over!");
+      }
+
+      snake.unshift(newHead);
+    }
+
+    function collision(head, array) {
+      for(let i=0; i<array.length; i++) {
+        if(head.x == array[i].x && head.y == array[i].y) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function showPopup() {
+      clearInterval(game);
+      const randomThreat = threats[Math.floor(Math.random()*threats.length)];
+      document.getElementById("threatText").innerText = "Threat: " + randomThreat.threat;
+      document.getElementById("defenseText").innerText = "Defense: " + randomThreat.defense;
+      document.getElementById("popup").style.display = "block";
+    }
+
+    function closePopup() {
+      document.getElementById("popup").style.display = "none";
+      game = setInterval(draw, 100);
+    }
+
+    let game = setInterval(draw, 100);
+  </script>
+</body>
+</html>

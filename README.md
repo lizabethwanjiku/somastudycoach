@@ -1,1 +1,1 @@
-# binnbuddy
+# snake-game

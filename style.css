@@ -1,11 +1,11 @@
 :root {
-  --bg: MediumSeaGreen;
+  --bg: skyblue;
   --ink: #172033;
-  --muted: #5d6a7e;
-  --line: MediumSeaGreen;
+  --muted: black;
+  --line: skyblue;
   --panel: #ffffff;
   --accent-dark: #0f5f59;
-  --accent-soft: MediumSeaGreen;
+  --accent-soft: skyblue
   --blue: #335c9b;
   --blue-soft: black;
   --danger: #a13b2d;
